@@ -35,7 +35,7 @@ class BaremetalFakeBios(
     delete_node = False
     api_microversion = '1.40'
 
-    @decorators.idempotent_id('ef55c44a-cc10-4cf6-8fda-85f0c0793150')
+    @decorators.idempotent_id('8a1bd41f-9175-4df6-96e0-45f8c6a88f7d')
     def test_bios_apply_and_reset_configuration(self):
         settings = [
             {
