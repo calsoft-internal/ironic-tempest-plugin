@@ -168,7 +168,7 @@ class SoftwareRaidDirect(bsm.BaremetalStandaloneScenarioTest):
         self.terminate_node(self.node['uuid'], force_delete=True)
 
 
-class BaremetalCleaningIdracWholedisk(
+class BaremetalManagementCleaningIdracWholedisk(
         bsm.BaremetalStandaloneScenarioTest):
 
     driver = 'idrac'
@@ -185,9 +185,11 @@ class BaremetalCleaningIdracWholedisk(
     @decorators.idempotent_id('9252ec6f-6b5b-447e-a323-c52775b88b4e')
     @utils.services('image', 'network')
     def test_clear_job_queue(self):
-        self.check_management_cleaning_wholedisk(self.node, 'clear_job_queue')
+        self.check_management_cleaning_wholedisk(self.node, 
+                                                 'clear_job_queue')
 
     @decorators.idempotent_id('7baeff52-7d6e-4dea-a48f-a85a6bfc9f62')
     @utils.services('image', 'network')
     def test_known_good_state(self):
-        self.check_management_cleaning_wholedisk(self.node, 'known_good_state')
+        self.check_management_cleaning_wholedisk(self.node, 
+                                                 'known_good_state')

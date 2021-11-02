@@ -380,8 +380,8 @@ class BaremetalStandaloneManager(bm.BaremetalScenarioTest,
         # was actually removing the metadata, because there was not a good
         # way to achieve that check for vms and baremetal
 
-    def check_management_cleaning_wholedisk(self, node, step):
-        """Tests the cleanup step for management cleaning steps.
+    def check_management_cleaning(self, node, step):
+        """Tests the cleanup for management cleaning steps.
 
         :param node: Ironic node to associate instance_uuid with, it is
             expected to be in 'available' state.
