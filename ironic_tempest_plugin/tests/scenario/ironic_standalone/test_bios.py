@@ -49,3 +49,25 @@ class BaremetalFakeBios(
         ]
 
         self.check_bios_apply_and_reset_configuration(self.node, settings)
+
+class BaremetalBiosCleaning(
+        bsm.BaremetalStandaloneScenarioTest):
+
+    driver = 'idrac'
+    bios_interface = 'idrac-wsman'
+    deploy_interface = 'direct'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    wholedisk_image = True
+    delete_node = False
+    api_microversion = '1.40'
+
+    @decorators.idempotent_id('3adf99b5-5c60-4472-ae90-ad036c9ae19b')
+    def test_bios_apply_and_reset_configuration(self):
+        settings = [
+            {
+                "name": "ProcVirtualization",
+                "value": "Disabled"
+            }
+        ]
+
+        self.check_bios_apply_and_reset_configuration(self.node, settings)
