@@ -16,8 +16,7 @@
 from tempest.common import utils
 from tempest import config
 from tempest.lib import decorators
-from ironic_tempest_plugin.common import utils \
-        as uls
+
 from ironic_tempest_plugin.tests.scenario import \
     baremetal_standalone_manager as bsm
 
@@ -71,7 +70,7 @@ class BaremetalAgentIpmitoolPartitioned(bsm.BaremetalStandaloneScenarioTest):
 
 class BaremetalPxeIpmitoolWholedisk(bsm.BaremetalStandaloneScenarioTest):
 
-    driver = 'idrac'
+    driver = 'pxe_ipmitool'
     image_ref = CONF.baremetal.whole_disk_image_ref
     wholedisk_image = True
 
@@ -84,7 +83,7 @@ class BaremetalPxeIpmitoolWholedisk(bsm.BaremetalStandaloneScenarioTest):
 class BaremetalPxeIpmitoolWholediskHttpLink(
         bsm.BaremetalStandaloneScenarioTest):
 
-    driver = 'idrac'
+    driver = 'pxe_ipmitool'
     image_ref = CONF.baremetal.whole_disk_image_url
     image_checksum = CONF.baremetal.whole_disk_image_checksum
     wholedisk_image = True
@@ -150,12 +149,12 @@ class BaremetalDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
     image_ref = CONF.baremetal.whole_disk_image_ref
     wholedisk_image = True
 
-   # @classmethod
-   # def skip_checks(cls):
-   #     super(BaremetalDriverDirectWholedisk, cls).skip_checks()
-   #     if cls.driver == 'ipmi':
-   #         skip_msg = ("Test covered when using redfish")
-   #         raise cls.skipException(skip_msg)
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalDriverDirectWholedisk, cls).skip_checks()
+        if cls.driver == 'ipmi':
+            skip_msg = ("Test covered when using redfish")
+            raise cls.skipException(skip_msg)
 
     @decorators.idempotent_id('c2db24e7-07dc-4a20-8f93-d4efae2bfd4e')
     @utils.services('image', 'network')
@@ -479,4 +478,3 @@ class BaremetalRedfishIPxeWholediskHttpLink(
     @utils.services('network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
-
