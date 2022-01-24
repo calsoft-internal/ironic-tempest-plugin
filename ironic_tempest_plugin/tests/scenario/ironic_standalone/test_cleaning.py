@@ -168,28 +168,58 @@ class SoftwareRaidDirect(bsm.BaremetalStandaloneScenarioTest):
         self.terminate_node(self.node['uuid'], force_delete=True)
 
 
-class BaremetalManagementCleaningIdracWholedisk(
+class BaremetalIdracManagementCleaning(
         bsm.BaremetalStandaloneScenarioTest):
 
+    mandatory_attr = ['driver']
     driver = 'idrac'
-    image_ref = CONF.baremetal.whole_disk_image_ref
-    wholedisk_image = True
     delete_node = False
     api_microversion = '1.28'
 
     @decorators.idempotent_id('d085ff72-abef-4931-a5b0-06efd5f9a037')
     @utils.services('image', 'network')
     def test_reset_idrac(self):
-        self.check_management_cleaning_wholedisk(self.node, 'reset_idrac')
+        clean_steps = [
+            {
+                "interface": "management",
+                "step": "reset_idrac"
+            }
+        ]
+
+        self.manual_cleaning(self.node, clean_steps=clean_steps)
 
     @decorators.idempotent_id('9252ec6f-6b5b-447e-a323-c52775b88b4e')
     @utils.services('image', 'network')
     def test_clear_job_queue(self):
-        self.check_management_cleaning_wholedisk(self.node, 
-                                                 'clear_job_queue')
+        clean_steps = [
+            {
+                "interface": "management",
+                "step": "clear_job_queue"
+            }
+        ]
+        self.manual_cleaning(self.node, clean_steps=clean_steps)
 
     @decorators.idempotent_id('7baeff52-7d6e-4dea-a48f-a85a6bfc9f62')
     @utils.services('image', 'network')
     def test_known_good_state(self):
-        self.check_management_cleaning_wholedisk(self.node, 
-                                                 'known_good_state')
+        clean_steps = [
+            {
+                "interface": "management",
+                "step": "known_good_state"
+            }
+        ]
+        self.manual_cleaning(self.node, clean_steps=clean_steps)
+
+
+class BaremetalIdracRedfishManagementCleaning(
+        BaremetalIdracManagementCleaning):
+
+    management_interface = 'idrac-redfish'
+    power_interface = 'idrac-redfish'
+
+
+class BaremetalIdracWsmaManagementCleaning(
+        BaremetalIdracManagementCleaning):
+
+    management_interface = 'idrac-wsman'
+    power_interface = 'idrac-wsman'

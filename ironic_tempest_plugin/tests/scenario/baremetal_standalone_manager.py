@@ -467,6 +467,12 @@ class BaremetalStandaloneScenarioTest(BaremetalStandaloneManager):
     # set via a different test).
     raid_interface = None
 
+    # The management interface to be use in the test
+    management_interface = None
+
+    # The power interface to be use in the test
+    power_interface = None
+
     # Boolean value specify if image is wholedisk or not.
     wholedisk_image = None
 
@@ -526,6 +532,20 @@ class BaremetalStandaloneScenarioTest(BaremetalStandaloneManager):
                 "in the list of enabled RAID interfaces %(enabled)s" % {
                     'iface': cls.raid_interface,
                     'enabled': CONF.baremetal.enabled_raid_interfaces})
+        if (cls.management_interface and cls.management_interface not in
+                CONF.baremetal.enabled_management_interfaces):
+            raise cls.skipException(
+                "Management interface %(iface)s required by test is not "
+                "in the list of enabled management interfaces %(enabled)s" % {
+                    'iface': cls.management_interface,
+                    'enabled': CONF.baremetal.enabled_management_interfaces})
+        if (cls.power_interface and cls.power_interface not in
+                CONF.baremetal.enabled_power_interfaces):
+            raise cls.skipException(
+                "Power interface %(iface)s required by test is not "
+                "in the list of enabled power interfaces %(enabled)s" % {
+                    'iface': cls.power_interface,
+                    'enabled': CONF.baremetal.enabled_power_interfaces})
         if not cls.wholedisk_image and CONF.baremetal.use_provision_network:
             raise cls.skipException(
                 'Partitioned images are not supported with multitenancy.')
@@ -564,6 +584,10 @@ class BaremetalStandaloneScenarioTest(BaremetalStandaloneManager):
             boot_kwargs['boot_interface'] = cls.boot_interface
         if cls.raid_interface:
             boot_kwargs['raid_interface'] = cls.raid_interface
+        if cls.management_interface:
+            boot_kwargs['management_interface'] = cls.management_interface
+        if cls.power_interface:
+            boot_kwargs['power_interface'] = cls.power_interface
 
         # just get an available node
         cls.node = cls.get_and_reserve_node()
