@@ -1,6 +1,8 @@
 #
 #    Copyright 2017 Mirantis Inc.
 #
+#    Copyright (c) 2021-2022 Dell Inc. or its subsidiaries.
+#
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
 #    a copy of the License at
@@ -467,10 +469,16 @@ class BaremetalStandaloneScenarioTest(BaremetalStandaloneManager):
     # set via a different test).
     raid_interface = None
 
-    # The management interface to be use in the test
+    # The management interface to use by the HW type. The management interface
+    # of the node used in the test will be set to this value. If set to None,
+    # the node will retain its existing management_interface value (which may
+    # have been set via a different test).
     management_interface = None
 
-    # The power interface to be use in the test
+    # The power interface to use by the HW type. The power interface of the
+    # node used in the test will be set to this value. If set to None, the
+    # node will retain its existing power_interface value (which may have been
+    # set via a different test).
     power_interface = None
 
     # Boolean value specify if image is wholedisk or not.
