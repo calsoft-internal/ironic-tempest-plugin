@@ -478,3 +478,18 @@ class BaremetalRedfishIPxeWholediskHttpLink(
     @utils.services('network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
+
+
+class BaremetalPXEIpmiDriverDirect(bsm.BaremetalStandaloneScenarioTest):
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'ipmi'
+    boot_interface = 'pxe'
+    deploy_interface = 'direct'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    wholedisk_image = True
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('21036e6a-1d77-5e54-cb71-d7f80998ab0d')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
