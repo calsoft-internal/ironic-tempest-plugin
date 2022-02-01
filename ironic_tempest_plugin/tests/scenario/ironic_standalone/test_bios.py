@@ -50,24 +50,82 @@ class BaremetalFakeBios(
 
         self.check_bios_apply_and_reset_configuration(self.node, settings)
 
-class BaremetalBiosCleaning(
+
+class BaremetalIdracBiosCleaning(
         bsm.BaremetalStandaloneScenarioTest):
 
+    mandatory_attr = ['driver', 'bios_interface']
     driver = 'idrac'
-    bios_interface = 'idrac-wsman'
     deploy_interface = 'direct'
-    image_ref = CONF.baremetal.whole_disk_image_ref
-    wholedisk_image = True
     delete_node = False
     api_microversion = '1.40'
 
-    @decorators.idempotent_id('3adf99b5-5c60-4472-ae90-ad036c9ae19b')
+    @decorators.idempotent_id('6ded82ab-b444-436b-bb78-06fa5957d6c3')
     def test_bios_apply_and_reset_configuration(self):
-        settings = [
+
+        new_settings = [
             {
                 "name": "ProcVirtualization",
-                "value": "Disabled"
+                "value": "Enabled"
+            },
+            {
+                "name": "BootMode",
+                "value": "Uefi"
             }
         ]
 
-        self.check_bios_apply_and_reset_configuration(self.node, settings)
+        clean_steps = [
+            {
+                "interface": "bios",
+                "step": "apply_configuration",
+                "args": {"settings": new_settings}
+            }
+        ]
+
+        _, bios_settings = self.baremetal_client.\
+            list_node_bios_settings(self.node['uuid'])
+
+        prev_settings = [
+            dict({i['name']:i['value']}) for setting in new_settings
+            for i in bios_settings['bios'] if setting['name'] == i['name']]
+        self.manual_cleaning(self.node, clean_steps=clean_steps)
+
+        _, bios_settings = self.baremetal_client.\
+            list_node_bios_settings(self.node['uuid'])
+
+        for setting in new_settings:
+            self.assertIn(setting['name'],
+                          [i['name'] for i in bios_settings['bios']])
+            self.assertIn(setting['value'],
+                          [i['value'] for i in bios_settings['bios']])
+
+        clean_steps_restore = [
+            {
+                "interface": "bios",
+                "step": "apply_configuration",
+                "args": {"settings": prev_settings}
+            }
+        ]
+
+        self.manual_cleaning(self.node, clean_steps=clean_steps_restore)
+
+        _, bios_settings = self.baremetal_client.\
+            list_node_bios_settings(self.node['uuid'])
+
+        for setting in prev_settings:
+            self.assertIn(setting['name'],
+                          [i['name'] for i in bios_settings['bios']])
+            self.assertIn(setting['value'],
+                          [i['value'] for i in bios_settings['bios']])
+
+
+class BaremetalIdracWSManBios(
+        BaremetalIdracBiosCleaning):
+
+    bios_interface = 'idrac-wsman'
+
+
+class BaremetalIdracRedfishBios(
+        BaremetalIdracBiosCleaning):
+
+    bios_interface = 'idrac-redfish'
