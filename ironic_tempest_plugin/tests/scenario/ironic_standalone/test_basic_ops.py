@@ -436,3 +436,18 @@ class BaremetalRedfishIPxeWholediskHttpLink(
     @utils.services('network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
+
+class BaremetalIdracDirectWholediskHttpLink(
+        bsm.BaremetalStandaloneScenerioTest):
+
+    api_microversion = '1.31'
+    driver = 'idrac'
+    deploy_interface = 'direct'
+    boot_interface = 'idrac-redfish-virtual-media'
+    image_ref = CONF.baremetal.whole_disk_image_url
+    wholedisk_image = True
+    
+    @utils.service('network')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
