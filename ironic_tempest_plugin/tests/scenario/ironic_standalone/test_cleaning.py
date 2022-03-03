@@ -166,3 +166,48 @@ class SoftwareRaidDirect(bsm.BaremetalStandaloneScenarioTest):
         # and remove it before exiting the test.
         self.remove_root_device_hint()
         self.terminate_node(self.node['uuid'], force_delete=True)
+
+
+class BaremetalIdracRaidCleaning(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver', 'raid_interface']
+
+    driver = 'idrac'
+    api_microversion = '1.55'
+    delete_node = False
+    raid_config = {
+        "logical_disks": [
+            {
+                "size_gb": 50,
+                "raid_level": "1+0",
+            }
+        ]
+    }
+
+    raid_delete_create_config_steps = [
+        {
+            "interface": "raid",
+            "step": "delete_configuration"
+        },
+        {
+            "interface": "raid",
+            "step": "create_configuration"
+        }
+    ]
+
+    @decorators.idempotent_id('8a908a3c-f2af-48fb-8553-9163715aa403')
+    def test_config_create_delete_raid(self):
+        self.baremetal_client.set_node_raid_config(self.node['uuid'],
+                                                   self.raid_config)
+        self.manual_cleaning(self.node,
+                             clean_steps=self.raid_delete_create_config_steps)
+
+
+class BaremetalIdracRedfishRaidCleaning(
+        BaremetalIdracRaidCleaning):
+    raid_interface = 'idrac-redfish'
+
+
+class BaremetalIdracWSManRaidCleaning(
+        BaremetalIdracRaidCleaning):
+    raid_interface = 'idrac-wsman'
