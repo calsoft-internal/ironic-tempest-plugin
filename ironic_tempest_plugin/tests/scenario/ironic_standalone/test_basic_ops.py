@@ -1,6 +1,8 @@
 #
 # Copyright 2017 Mirantis Inc.
 #
+# Copyright (c) 2022 Dell Inc. or its subsidiaries.
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -442,9 +444,9 @@ class BaremetalIdracVirtualMedia(
         bsm.BaremetalStandaloneScenerioTest):
 
     mandatory_attr = ['driver', 'boot_interface']
+    credential = ['primary', 'admin']
     api_microversion = '1.31'
     driver = 'idrac'
-    deploy_interface = 'direct'
     boot_interface = 'idrac-redfish-virtual-media'
 
     @utils.services('image', 'network')
