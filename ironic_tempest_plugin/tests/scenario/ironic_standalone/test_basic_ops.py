@@ -162,44 +162,66 @@ class BaremetalDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
         self.boot_and_verify_node()
 
 
-class BaremetalIdracDriverDirect(bsm.BaremetalStandaloneScenarioTest):
+class BaremetalIdracDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
 
     api_microversion = '1.31'  # to set the deploy_interface
     driver = 'idrac'
-    deploy_interface = 'direct'
     image_ref = CONF.baremetal.whole_disk_image_ref
-    wholedisk_image = True
+    if CONF.baremetal_feature_enabled.ipxe_enabled:
+        boot_interface = 'ipxe'
+    else:
+        boot_interface = 'pxe'
 
-    @utils.services('image', 'network')
     @decorators.idempotent_id('c2bebda2-fd27-4b10-9015-f7d877f0eb60')
+    @utils.services('image', 'network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
 
 
-class BaremetalRedfishDriverDirect(bsm.BaremetalStandaloneScenarioTest):
+class IdracWSManDeployNode(BaremetalIdracDeployNode):
+    power_interface = 'idrac-wsman'
+    management_interface = 'idrac-wsman'
+
+
+class IdracRedfishDeployNode(BaremetalIdracDeployNode):
+    power_interface = 'idrac-redfish'
+    management_interface = 'idrac-redfish'
+
+
+class BaremetalRedfishDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
 
     api_microversion = '1.31'  # to set the deploy_interface
     driver = 'redfish'
-    deploy_interface = 'direct'
     image_ref = CONF.baremetal.whole_disk_image_ref
-    wholedisk_image = True
+    if CONF.baremetal_feature_enabled.ipxe_enabled:
+        boot_interface = 'ipxe'
+    else:
+        boot_interface = 'pxe'
 
-    @utils.services('image', 'network')
     @decorators.idempotent_id('dde74f6a-15a6-40c1-bfd5-eab54252ed56')
+    @utils.services('image', 'network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
 
 
-class BaremetalIpmiDriverDirect(bsm.BaremetalStandaloneScenarioTest):
+class BaremetalIpmiDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
 
     api_microversion = '1.31'  # to set the deploy_interface
     driver = 'ipmi'
-    deploy_interface = 'direct'
     image_ref = CONF.baremetal.whole_disk_image_ref
-    wholedisk_image = True
+    if CONF.baremetal_feature_enabled.ipxe_enabled:
+        boot_interface = 'ipxe'
+    else:
+        boot_interface = 'pxe'
 
-    @utils.services('image', 'network')
     @decorators.idempotent_id('21036e6b-8d77-4e54-bb71-c7f80998ab0d')
+    @utils.services('image', 'network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
 
@@ -476,20 +498,5 @@ class BaremetalRedfishIPxeWholediskHttpLink(
 
     @decorators.idempotent_id('113acd0a-9872-4631-b3ee-54da7e3bb262')
     @utils.services('network')
-    def test_ip_access_to_server(self):
-        self.boot_and_verify_node()
-
-
-class BaremetalPXEIpmiDriverDirect(bsm.BaremetalStandaloneScenarioTest):
-
-    api_microversion = '1.31'  # to set the deploy_interface
-    driver = 'ipmi'
-    boot_interface = 'pxe'
-    deploy_interface = 'direct'
-    image_ref = CONF.baremetal.whole_disk_image_ref
-    wholedisk_image = True
-
-    @utils.services('image', 'network')
-    @decorators.idempotent_id('21036e6a-1d77-5e54-cb71-d7f80998ab0d')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
