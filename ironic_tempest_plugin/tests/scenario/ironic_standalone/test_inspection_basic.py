@@ -60,8 +60,9 @@ class InspectBasicTest(bsm.BaremetalStandaloneScenarioTest):
                                                        'provide')
         self.wait_provisioning_state(self.node['uuid'],
                                      'available')
-        self.set_node_to_active(self.image_ref)
-
+        self.update_node(self.node['uuid'], [{'op': 'replace',
+                                            'path': '/instance_uuid',
+                                            'value': None}])
 
 class BaremetalIdracRedfishInspect(
         InspectBasicTest):
