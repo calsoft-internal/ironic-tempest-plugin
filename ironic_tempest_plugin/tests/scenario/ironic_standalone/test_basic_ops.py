@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_log import log as logging
 from tempest.common import utils
 from tempest import config
 from tempest.lib import decorators
@@ -21,6 +22,7 @@ from ironic_tempest_plugin.tests.scenario import \
     baremetal_standalone_manager as bsm
 
 CONF = config.CONF
+LOG = logging.getLogger(__name__)
 
 
 class BaremetalAgentIpmitoolWholedisk(bsm.BaremetalStandaloneScenarioTest):
@@ -157,70 +159,6 @@ class BaremetalDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
             raise cls.skipException(skip_msg)
 
     @decorators.idempotent_id('c2db24e7-07dc-4a20-8f93-d4efae2bfd4e')
-    @utils.services('image', 'network')
-    def test_ip_access_to_server(self):
-        self.boot_and_verify_node()
-
-
-class BaremetalIdracDeployNode(bsm.BaremetalStandaloneScenarioTest):
-
-    mandatory_attr = ['driver']
-
-    api_microversion = '1.31'  # to set the deploy_interface
-    driver = 'idrac'
-    image_ref = CONF.baremetal.whole_disk_image_ref
-    if CONF.baremetal_feature_enabled.ipxe_enabled:
-        boot_interface = 'ipxe'
-    else:
-        boot_interface = 'pxe'
-
-    @decorators.idempotent_id('c2bebda2-fd27-4b10-9015-f7d877f0eb60')
-    @utils.services('image', 'network')
-    def test_ip_access_to_server(self):
-        self.boot_and_verify_node()
-
-
-class IdracWSManDeployNode(BaremetalIdracDeployNode):
-    power_interface = 'idrac-wsman'
-    management_interface = 'idrac-wsman'
-
-
-class IdracRedfishDeployNode(BaremetalIdracDeployNode):
-    power_interface = 'idrac-redfish'
-    management_interface = 'idrac-redfish'
-
-
-class BaremetalRedfishDeployNode(bsm.BaremetalStandaloneScenarioTest):
-
-    mandatory_attr = ['driver']
-
-    api_microversion = '1.31'  # to set the deploy_interface
-    driver = 'redfish'
-    image_ref = CONF.baremetal.whole_disk_image_ref
-    if CONF.baremetal_feature_enabled.ipxe_enabled:
-        boot_interface = 'ipxe'
-    else:
-        boot_interface = 'pxe'
-
-    @decorators.idempotent_id('dde74f6a-15a6-40c1-bfd5-eab54252ed56')
-    @utils.services('image', 'network')
-    def test_ip_access_to_server(self):
-        self.boot_and_verify_node()
-
-
-class BaremetalIpmiDeployNode(bsm.BaremetalStandaloneScenarioTest):
-
-    mandatory_attr = ['driver']
-
-    api_microversion = '1.31'  # to set the deploy_interface
-    driver = 'ipmi'
-    image_ref = CONF.baremetal.whole_disk_image_ref
-    if CONF.baremetal_feature_enabled.ipxe_enabled:
-        boot_interface = 'ipxe'
-    else:
-        boot_interface = 'pxe'
-
-    @decorators.idempotent_id('21036e6b-8d77-4e54-bb71-c7f80998ab0d')
     @utils.services('image', 'network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
@@ -500,3 +438,109 @@ class BaremetalRedfishIPxeWholediskHttpLink(
     @utils.services('network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
+
+
+class BaremetalIdracWSManDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'idrac'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'ipxe'
+
+    @decorators.idempotent_id('c2bebda2-fd27-4b10-9015-f7d877f0eb60')
+    @utils.services('image', 'network')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIdracWSManDeployNodeipxe(BaremetalIdracWSManDeployNode):
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIdracWSManDeployNodeipxe, cls).skip_checks()
+        if CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Test covered with boot interface as ipxe")
+            raise cls.skipException(skip_msg)
+    boot_interface = 'pxe'
+
+
+class BaremetalIdracRedfishDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'idrac'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'ipxe'
+    power_interface = 'idrac-redfish'
+    management_interface = 'idrac-redfish'
+
+    @decorators.idempotent_id('d2bebda2-ad27-4b10-9015-f7d877f0eb87')
+    @utils.services('image', 'network')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIdracRedfishDeployNodepxe(BaremetalIdracRedfishDeployNode):
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIdracRedfishDeployNodepxe, cls).skip_checks()
+        if CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Test covered with boot interface as ipxe")
+            raise cls.skipException(skip_msg)
+    boot_interfaces = 'pxe'
+
+
+class BaremetalRedfishDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'redfish'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'ipxe'
+
+    @decorators.idempotent_id('dde74f6a-15a6-40c1-bfd5-eab54252ed56')
+    @utils.services('image', 'network')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalRedfishDeployNodepxe(BaremetalRedfishDeployNode):
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalRedfishDeployNodepxe, cls).skip_checks()
+        if CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Test covered with boot interface as ipxe")
+            raise cls.skipException(skip_msg)
+    boot_interface = 'pxe'
+
+
+class BaremetalIpmiDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'ipmi'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'ipxe'
+
+    @decorators.idempotent_id('21036e6b-8d77-4e54-bb71-c7f80998ab0d')
+    @utils.services('image', 'network')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIpmiDeployNodepxe(BaremetalIpmiDeployNode):
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIpmiDeployNodepxe, cls).skip_checks()
+        if CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Test covered with boot interface as ipxe")
+            raise cls.skipException(skip_msg)
+    boot_interface = 'pxe'
