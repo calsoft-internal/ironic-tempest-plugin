@@ -22,7 +22,7 @@ class InspectBasicTest(bsm.BaremetalStandaloneScenarioTest):
 
     driver = 'idrac'
     mandatory_attr = ['driver', 'inspect_interface']
-    image_ref = CONF.baremetal.whole_disk_image_ref
+    credentials = ['primary', 'admin']
 
     def verify_node_inspection_data(self, node):
         self.assertEqual(node['properties']['cpu_arch'],
@@ -37,7 +37,6 @@ class InspectBasicTest(bsm.BaremetalStandaloneScenarioTest):
 
             * Sets nodes to manageable state
             * Inspects nodes
-            * Verifies all properties are inspected
             * Verifies inspection data
             * Sets node to available state
 
