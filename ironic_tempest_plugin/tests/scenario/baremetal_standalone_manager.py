@@ -568,6 +568,9 @@ class BaremetalStandaloneScenarioTest(BaremetalStandaloneManager):
             except lib_exc.NotFound:
                 pass
         cls.terminate_node(cls.node['uuid'])
+        cls.update_node(cls.node['uuid'], [{'op': 'replace',
+                                            'path': '/instance_uuid',
+                                            'value': None}])
         base.reset_baremetal_api_microversion()
         super(BaremetalStandaloneManager, cls).resource_cleanup()
 
