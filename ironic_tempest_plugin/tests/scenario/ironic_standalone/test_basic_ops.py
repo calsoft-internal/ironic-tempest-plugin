@@ -447,7 +447,9 @@ class BaremetalIdracVirtualMedia(
     credential = ['primary', 'admin']
     api_microversion = '1.31'
     driver = 'idrac'
+    deploy_interface = 'direct'
     boot_interface = 'idrac-redfish-virtual-media'
+    image_ref = CONF.baremetal.whole_disk_image_url
 
     @utils.services('image', 'network')
     def test_deploy_virtual_media_boot(self):
