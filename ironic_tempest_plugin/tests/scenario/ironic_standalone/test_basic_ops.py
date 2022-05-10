@@ -451,7 +451,7 @@ class BaremetalIdracVirtualMedia(
     boot_interface = 'idrac-redfish-virtual-media'
     image_ref = CONF.baremetal.whole_disk_image_url
 
-    @utils.services('image', 'network')
     @decorators.idempotent_id('b0bc87a5-4324-4134-bd5f-4bb1cf549e5c')
+    @utils.services('image', 'network')
     def test_deploy_virtual_media_boot(self):
         self.boot_and_verify_node()
