@@ -23,3 +23,7 @@ class IntrospectionTimeout(exceptions.TempestException):
 
 class HypervisorUpdateTimeout(exceptions.TempestException):
     message = "Hypervisor stats update time out"
+
+
+class InvalidParameterValue(exceptions.TempestException):
+    message = "Invalid parameter"

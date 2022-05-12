@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "idrac storage inventory configuration json schema",
+    "type": "object",
+    "properties": {
+        "controllers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "controller_id": {
+                        "type": "string",
+                        "description": "Controller ID to be used for this logical disk. Required "
+                    },
+                    "controller_model": {
+                        "type": "string",
+                        "description": "Controller model to be used for this logical disks. Optional -for identification of controller"
+                    },
+                    "media_type": {
+                        "type": "string",
+                        "enum": [ "hdd", "ssd" ],
+                        "description": "The type of disk preferred. Valid values are 'hdd' and 'ssd'.Required "
+                    },
+                    "number_of_physical_disks": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMinimum": true,
+                        "description": "Number of physical disks to use for this logical disk. By default, the driver uses the minimum number of disks required for that RAID level. Optional."
+                    },
+                    "physical_disks": {
+                        "anyOf": [
+                            {"type": "array", "items": { "type": "string" }},
+                            {"type": "array", "items": { "type": "object" }, "minItems": 2}
+                        ],
+                        "description": "The physical disks to use for this logical disk. required "
+                    }
+                },
+               "required": ["controller_id"],
+                "additionalProperties": false,
+                "dependencies": {
+                    "physical_disks": ["controller_id"]
+                }
+            },
+            "minItems": 1
+        }
+    },
+    "required": ["controllers"],
+    "additionalProperties": false
+}
