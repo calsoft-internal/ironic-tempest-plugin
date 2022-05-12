@@ -109,6 +109,8 @@ BaremetalGroup = [
                     "min_microversion and max_microversion. "
                     "If both values are None, Tempest avoids tests which "
                     "require a microversion."),
+    cfg.StrOpt('storage_inventory',
+               help="storage inventory for raid cleaning"),
     cfg.StrOpt('max_microversion',
                default='latest',
                help="Upper version of the test target microversion range. "
@@ -187,6 +189,10 @@ BaremetalFeaturesGroup = [
                 # requires the plugin to be able to read ipmi_password.
                 default=False,
                 help="Defines if adoption is enabled"),
+    cfg.BoolOpt('raid_controller_present',
+                default=False,
+                help="Defines if hardware controller supporting RAID "
+                     "is present. "),
     cfg.BoolOpt('software_raid',
                 default=False,
                 help="Defines if software RAID is enabled (available "

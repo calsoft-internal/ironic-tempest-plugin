@@ -13,13 +13,20 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
+import os
+
+import jsonschema
+from jsonschema import exceptions as json_schema_exc
 from oslo_log import log as logging
 from tempest.common import utils
 from tempest import config
 from tempest.lib import decorators
 
+from ironic_tempest_plugin import exceptions
 from ironic_tempest_plugin.tests.scenario import \
     baremetal_standalone_manager as bsm
+
 
 LOG = logging.getLogger(__name__)
 CONF = config.CONF
@@ -166,3 +173,109 @@ class SoftwareRaidDirect(bsm.BaremetalStandaloneScenarioTest):
         # and remove it before exiting the test.
         self.remove_root_device_hint()
         self.terminate_node(self.node['uuid'], force_delete=True)
+
+
+class BaremetalIdracRaidCleaning(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver', 'raid_interface']
+
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    wholedisk_image = True
+    storage_inventory = CONF.baremetal.storage_inventory
+    driver = 'idrac'
+    api_microversion = '1.55'
+    delete_node = False
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIdracRaidCleaning, cls).skip_checks()
+        if not CONF.baremetal_feature_enabled.raid_controller_present:
+            raise cls.skipException("Controller which support hardware raid\
+                    is not present")
+
+    def storage_inventory_validation(self, storage_inventory,
+                                     storage_inventory_schema):
+        """Validates the storage information passed using JSON schema.
+
+        This method validates a storage inventory infomration against
+
+        a storage inventory schema.
+
+        :param storage_inventory : A dictionary containing storage inventory
+
+        information.
+
+        :param storage_inventory_schema : A dictionary which is the schema
+
+        to be used for validation of storage inventory.
+
+        :raises: InvalidParameterValue, if validation of the storage inventory
+        fails.
+
+        """
+
+        try:
+            jsonschema.validate(storage_inventory, storage_inventory_schema)
+        except json_schema_exc.ValidationError as e:
+            msg = _("RAID config validation error: %s") % e.message
+            raise exceptions.InvalidParameterValue(msg)
+
+    @decorators.idempotent_id('8a908a3c-f2af-48fb-8553-9163715aa403')
+    @utils.services('image', 'network')
+    def test_hardware_raid(self):
+        raid_config = {
+            "logical_disks": [
+                {
+                    "size_gb": 100,
+                    "raid_level": "1"
+                }
+            ]
+        }
+        self.build_raid_and_verify_node(
+            config=raid_config,
+            deloy_time=CONF.baremetal_feature_enabled.deploy_time_raid,
+            raid_ctrl_present=True)
+        self.remove_root_device_hint()
+        self.terminate_node(self.node['uuid'], force_delete=True)
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('92fe534d-77f1-422d-84e4-e30fe9e3d928')
+    def test_raid_cleaning_max_size_raid_10(self):
+        storage_inventory = json.loads(self.storage_inventory)
+        STORAGE_INVENTORY_SCHEMA = os.path.join(os.path.dirname(
+            __file__), 'idrac_storage_inventory_schema.json')
+        with open(STORAGE_INVENTORY_SCHEMA, 'r') as storage_schema_fobj:
+            storage_inventory_schema = json.load(storage_schema_fobj)
+        self.storage_inventory_validation(storage_inventory,
+                                          storage_inventory_schema)
+        controller = storage_inventory['controllers'][0]['controller_id']
+        media_type = storage_inventory['controllers'][0]['media_type']
+        physical_disks = [x['disk_id'] for x in (
+            storage_inventory['controllers'][0]['physical_disks'])]
+        raid_config = {
+            "logical_disks": [
+                {
+                    "size_gb": "MAX",
+                    "raid_level": "1+0",
+                    "controller": controller,
+                    "disk_type": media_type,
+                    "physical_disks": physical_disks
+                }
+            ]
+        }
+        self.build_raid_and_verify_node(
+            config=raid_config,
+            deloy_time=CONF.baremetal_feature_enabled.deploy_time_raid,
+            raid_ctrl_present=True)
+        self.remove_root_device_hint()
+        self.terminate_node(self.node['uuid'], force_delete=True)
+
+
+class BaremetalIdracRedfishRaidCleaning(
+        BaremetalIdracRaidCleaning):
+    raid_interface = 'idrac-redfish'
+
+
+class BaremetalIdracWSManRaidCleaning(
+        BaremetalIdracRaidCleaning):
+    raid_interface = 'idrac-wsman'

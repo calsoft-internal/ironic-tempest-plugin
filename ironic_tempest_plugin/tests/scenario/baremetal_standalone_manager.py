@@ -577,7 +577,8 @@ class BaremetalStandaloneScenarioTest(BaremetalStandaloneManager):
         self.assertTrue(self.ping_ip_address(self.node_ip,
                                              should_succeed=should_succeed))
 
-    def build_raid_and_verify_node(self, config=None, deploy_time=False):
+    def build_raid_and_verify_node(self, config=None, deploy_time=False,
+                                   raid_ctrl_present=False):
         config = config or self.raid_config
         if deploy_time:
             steps = [
@@ -625,8 +626,12 @@ class BaremetalStandaloneScenarioTest(BaremetalStandaloneManager):
 
         # NOTE(dtantsur): this is not required, but it allows us to check that
         # the RAID device was in fact created and is used for deployment.
-        patch = [{'path': '/properties/root_device',
-                  'op': 'add', 'value': {'name': '/dev/md0'}}]
+        if raid_ctrl_present:
+            patch = [{'path': '/properties/root_device',
+                      'op': 'add', 'value': {'name': '/dev/sda'}}]
+        else:
+            patch = [{'path': '/properties/root_device',
+                      'op': 'add', 'value': {'name': '/dev/md0'}}]
         if deploy_time:
             patch.append({'path': '/instance_info/traits',
                           'op': 'add', 'value': ['CUSTOM_RAID']})
