@@ -440,17 +440,18 @@ class BaremetalRedfishIPxeWholediskHttpLink(
         self.boot_and_verify_node()
 
 
-class BaremetalIdracWSManDeployNode(bsm.BaremetalStandaloneScenarioTest):
+class BaremetalIdracDeployNodeipxe(bsm.BaremetalStandaloneScenarioTest):
 
     mandatory_attr = ['driver']
     api_microversion = '1.31'  # to set the deploy_interface
     driver = 'idrac'
     image_ref = CONF.baremetal.whole_disk_image_ref
     boot_interface = 'ipxe'
+    deploy_interface = 'direct'
 
     @classmethod
     def skip_checks(cls):
-        super(BaremetalIdracWSManDeployNode, cls).skip_checks()
+        super(BaremetalIdracDeployNodeipxe, cls).skip_checks()
         if not CONF.baremetal_feature_enabled.ipxe_enabled:
             skip_msg = ("Skipping the test case since ipxe is disabled")
             raise cls.skipException(skip_msg)
@@ -461,17 +462,18 @@ class BaremetalIdracWSManDeployNode(bsm.BaremetalStandaloneScenarioTest):
         self.boot_and_verify_node()
 
 
-class BaremetalIdracWSManDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
+class BaremetalIdracDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
 
     mandatory_attr = ['driver']
     api_microversion = '1.31'  # to set the deploy_interface
     driver = 'idrac'
     image_ref = CONF.baremetal.whole_disk_image_ref
     boot_interface = 'pxe'
+    deploy_interface = 'direct'
 
     @classmethod
     def skip_checks(cls):
-        super(BaremetalIdracWSManDeployNodepxe, cls).skip_checks()
+        super(BaremetalIdracDeployNodepxe, cls).skip_checks()
         if CONF.baremetal_feature_enabled.ipxe_enabled:
             skip_msg = ("Skipping the test case since ipxe is enabled")
             raise cls.skipException(skip_msg)
@@ -482,13 +484,23 @@ class BaremetalIdracWSManDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
         self.boot_and_verify_node()
 
 
-class BaremetalIdracRedfishDeployNode(BaremetalIdracWSManDeployNode):
+class BaremetalIdracWSManDeployNode(BaremetalIdracDeployNodeipxe):
+    power_interface = 'idrac-wsman'
+    management_interface = 'idrac-wsman'
+
+
+class BaremetalIdracWSManDeployNodepxe(BaremetalIdracDeployNodepxe):
+    power_interface = 'idrac-wsman'
+    management_interface = 'idrac-wsman'
+
+
+class BaremetalIdracRedfishDeployNode(BaremetalIdracDeployNodeipxe):
 
     power_interface = 'idrac-redfish'
     management_interface = 'idrac-redfish'
 
 
-class BaremetalIdracRedfishDeployNodepxe(BaremetalIdracWSManDeployNodepxe):
+class BaremetalIdracRedfishDeployNodepxe(BaremetalIdracDeployNodepxe):
 
     power_interface = 'idrac-redfish'
     management_interface = 'idrac-redfish'
@@ -501,6 +513,7 @@ class BaremetalRedfishDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
     driver = 'redfish'
     image_ref = CONF.baremetal.whole_disk_image_ref
     boot_interface = 'pxe'
+    deploy_interface = 'direct'
 
     @classmethod
     def skip_checks(cls):
@@ -522,6 +535,7 @@ class BaremetalIpmiDeployNode(bsm.BaremetalStandaloneScenarioTest):
     driver = 'ipmi'
     image_ref = CONF.baremetal.whole_disk_image_ref
     boot_interface = 'ipxe'
+    deploy_interface = 'direct'
 
     @classmethod
     def skip_checks(cls):
@@ -543,6 +557,7 @@ class BaremetalIpmiDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
     driver = 'ipmi'
     image_ref = CONF.baremetal.whole_disk_image_ref
     boot_interface = 'pxe'
+    deploy_interface = 'direct'
 
     @classmethod
     def skip_checks(cls):
