@@ -110,7 +110,7 @@ BaremetalGroup = [
                     "If both values are None, Tempest avoids tests which "
                     "require a microversion."),
     cfg.StrOpt('storage_inventory',
-               help="storage inventory for raid cleaning"),
+               help="storage inventory file location for raid cleaning"),
     cfg.StrOpt('max_microversion',
                default='latest',
                help="Upper version of the test target microversion range. "
