@@ -1,0 +1,94 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "storage inventory json schema",
+    "type": "object",
+    "properties": {
+        "storage_inventory":{
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "controllers": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "description": "The unique identifier for this storage controller. ",
+                                    "type": [ "string", "null"]
+                                },
+                                "serialNumber": {
+                                    "description": "The serial number for this storage controller. ",
+                                    "type": [ "string", "null"]
+                                },
+                                "manufacturer": {
+                                    "description": "The manufacturer of this storage controller. ",
+                                    "type": [ "string", "null"]
+                                },
+                                "model": {
+                                    "description": "manufacturer's referance to the storage controller.",
+                                    "type": [ "string", "null"]
+                                },
+                                "name": {
+                                    "description": "The durable names for the storage controller. ",
+                                    "type": [ "string", "null"]
+                                 },
+                                "supportedcontrollerprotocols": {
+                                    "description": "The supported set of protocols for communicating to this storage controller. ",
+                                    "enum": [ "sas", "sata","scsi" ],
+                                    "type": [ "string", "null"]
+                                },
+                                "Supportedraidtypes": {
+                                    "description": "This property contain an array of all the RAID types supported by this controller.",
+                                    "type": [ "string", "null"]
+                                },
+                                "number_of_physical_disks": {
+                                    "type": "integer",
+                                    "description": "Number of physical disks in a controller."
+                                },
+                                "physical_disks": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                             "id": {
+                                                "description": "The unique identifier for resource within the collection of similar resources.",
+                                                "type": [ "string", "null"]
+                                             },
+                                            "model": {
+                                                "description": "The model number for the drive.",
+                                                "longDescription": "This property shall contain the name by which the manufacturer generally refers to the drive.",
+                                                "type": [ "string", "null"]
+                                                 },
+                                            "media_type": {
+                                                "description": "media type of this drive" ,
+                                                "enum": [ "hdd", "ssd" ],
+                                                "type": [ "string", "null"]
+                                             },
+                                             "serialnumber": {
+                                                "description": "The serial number for this drive.",
+                                                "longDescription": "This property shall contain the manufacturer-allocated number that identifies the drive.",
+                                                "readonly": true,
+                                                "type": [ "string", "null"]
+                                             }
+                                        }
+                                    },
+                                   "required": ["id"]
+                                }
+                            }
+                        },
+                        "required": ["id","number_of_physical_disks"],
+                        "additionalProperties": false,
+                        "dependencies": {
+                        "physical_disks": ["id"]
+                        },
+                        "minItems": 1
+                    }
+                }
+            },
+            "required": ["controllers"],
+            "additionalProperties": false,
+            "minItems": 1
+        }
+    }
+}

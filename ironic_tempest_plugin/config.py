@@ -122,6 +122,8 @@ BaremetalGroup = [
     cfg.BoolOpt('use_provision_network',
                 default=False,
                 help="Whether the Ironic/Neutron tenant isolation is enabled"),
+    cfg.StrOpt('storage_inventory',
+               help="storage inventory for raid cleaning"),
     cfg.StrOpt('whole_disk_image_ref',
                help="UUID of the wholedisk image to use in the tests."),
     cfg.StrOpt('whole_disk_image_url',
