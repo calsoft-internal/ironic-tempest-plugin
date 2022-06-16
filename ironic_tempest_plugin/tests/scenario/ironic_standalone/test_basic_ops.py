@@ -1,6 +1,8 @@
 #
 # Copyright 2017 Mirantis Inc.
 #
+# Copyright (c) 2022 Dell Inc. or its subsidiaries.
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -435,4 +437,21 @@ class BaremetalRedfishIPxeWholediskHttpLink(
     @decorators.idempotent_id('113acd0a-9872-4631-b3ee-54da7e3bb262')
     @utils.services('network')
     def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIdracVirtualMedia(
+        bsm.BaremetalStandaloneScenerioTest):
+
+    mandatory_attr = ['driver', 'boot_interface']
+    credential = ['primary', 'admin']
+    api_microversion = '1.31'
+    driver = 'idrac'
+    deploy_interface = 'direct'
+    boot_interface = 'idrac-redfish-virtual-media'
+    image_ref = CONF.baremetal.whole_disk_image_url
+
+    @decorators.idempotent_id('b0bc87a5-4324-4134-bd5f-4bb1cf549e5c')
+    @utils.services('image', 'network')
+    def test_deploy_virtual_media_boot(self):
         self.boot_and_verify_node()
