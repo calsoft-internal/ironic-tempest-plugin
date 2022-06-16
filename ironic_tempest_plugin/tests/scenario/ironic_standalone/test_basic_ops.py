@@ -141,8 +141,8 @@ class BaremetalDriverIscsiWholedisk(bsm.BaremetalStandaloneScenarioTest):
 class BaremetalDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
 
     api_microversion = '1.31'  # to set the deploy_interface
-    if 'redfish' in CONF.baremetal.enabled_hardware_types:
-        driver = 'redfish'
+    if 'idrac' in CONF.baremetal.enabled_hardware_types:
+        driver = 'idrac'
     else:
         driver = 'ipmi'
     deploy_interface = 'direct'
@@ -158,6 +158,48 @@ class BaremetalDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
 
     @decorators.idempotent_id('c2db24e7-07dc-4a20-8f93-d4efae2bfd4e')
     @utils.services('image', 'network')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIdracDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'idrac'
+    deploy_interface = 'direct'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    wholedisk_image = True
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('c2bebda2-fd27-4b10-9015-f7d877f0eb60')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalRedfishDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'redfish'
+    deploy_interface = 'direct'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    wholedisk_image = True
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('dde74f6a-15a6-40c1-bfd5-eab54252ed56')
+    def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIpmiDriverDirectWholedisk(bsm.BaremetalStandaloneScenarioTest):
+
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'ipmi'
+    deploy_interface = 'direct'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    wholedisk_image = True
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('21036e6b-8d77-4e54-bb71-c7f80998ab0d')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
 
