@@ -445,7 +445,7 @@ class BaremetalIdracSyncBootModeDirectWholedisk(
         ['driver', 'power_interface', 'management_interface',
             'bios_interface']
 
-    # this api_microversion is compatible with list_node_bios_settings
+    # Below api microversion is compatible with list_node_bios_settings
     # hence using this perticular version
     api_microversion = '1.40'  # to set the deploy_interface
     driver = 'idrac'
