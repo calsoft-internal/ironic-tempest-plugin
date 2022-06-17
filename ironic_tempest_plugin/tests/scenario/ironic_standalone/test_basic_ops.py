@@ -438,12 +438,17 @@ class BaremetalRedfishIPxeWholediskHttpLink(
         self.boot_and_verify_node()
 
 
+<<<<<<< HEAD
 class BaremetalIdracSyncBootModeDirectWholedisk(
+=======
+class BaremetalIdracSyncBootMode(
+>>>>>>> b9a561cbb714d33f3096e43b8cf7ea9db9067e3b
         bsm.BaremetalStandaloneScenarioTest):
 
     mandatory_attr = \
         ['driver', 'power_interface', 'management_interface',
             'bios_interface']
+<<<<<<< HEAD
 
     # this api_microversion is compatible with list_node_bios_settings
     # hence using this perticular version
@@ -451,11 +456,19 @@ class BaremetalIdracSyncBootModeDirectWholedisk(
     driver = 'idrac'
     image_ref = CONF.baremetal.whole_disk_image_ref
     wholedisk_image = True
+=======
+    api_microversion = '1.40'  # to set the deploy_interface
+    driver = 'idrac'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+>>>>>>> b9a561cbb714d33f3096e43b8cf7ea9db9067e3b
     boot_interface = 'ipxe'
     power_interface = 'idrac-redfish'
     management_interface = 'idrac-redfish'
     bios_interface = 'idrac-redfish'
+<<<<<<< HEAD
     deploy_interface = 'direct'
+=======
+>>>>>>> b9a561cbb714d33f3096e43b8cf7ea9db9067e3b
 
     def get_boot_mode_from_baremetal(self):
         _, bios_settings = self.baremetal_client.\
@@ -468,6 +481,17 @@ class BaremetalIdracSyncBootModeDirectWholedisk(
                     boot_mode = 'boot_mode:uefi'
         return boot_mode
 
+<<<<<<< HEAD
+=======
+    def verify_bios_setting(self, boot_mode):
+        mode, value1 = boot_mode.split(':')
+        _, current_bios_settings = self.baremetal_client.\
+            list_node_bios_settings(self.node['uuid'])
+        for attr_name in current_bios_settings['bios']:
+            if attr_name['name'] == 'BootMode':
+                self.assertEqual(attr_name['value'].lower(), value1)
+
+>>>>>>> b9a561cbb714d33f3096e43b8cf7ea9db9067e3b
     @decorators.idempotent_id('c2bebda2-fd27-4b10-9015-f7d877f0eb60')
     @utils.services('image', 'network')
     def test_sync_boot_mode(self):
@@ -477,3 +501,7 @@ class BaremetalIdracSyncBootModeDirectWholedisk(
                                               'path': path,
                                               'value': mode_to_update}])
         self.boot_and_verify_node()
+<<<<<<< HEAD
+=======
+        self.verify_bios_setting(mode_to_update)
+>>>>>>> b9a561cbb714d33f3096e43b8cf7ea9db9067e3b
