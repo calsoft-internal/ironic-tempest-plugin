@@ -436,3 +436,44 @@ class BaremetalRedfishIPxeWholediskHttpLink(
     @utils.services('network')
     def test_ip_access_to_server(self):
         self.boot_and_verify_node()
+
+
+class BaremetalIdracSyncBootModeDirectWholedisk(
+        bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = \
+        ['driver', 'power_interface', 'management_interface',
+            'bios_interface']
+
+    # Below api microversion is compatible with list_node_bios_settings
+    # hence using this perticular version
+    api_microversion = '1.40'  # to set the deploy_interface
+    driver = 'idrac'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    wholedisk_image = True
+    boot_interface = 'ipxe'
+    power_interface = 'idrac-redfish'
+    management_interface = 'idrac-redfish'
+    bios_interface = 'idrac-redfish'
+    deploy_interface = 'direct'
+
+    def get_boot_mode_from_baremetal(self):
+        _, bios_settings = self.baremetal_client.\
+            list_node_bios_settings(self.node['uuid'])
+        for attr_name in bios_settings['bios']:
+            if attr_name['name'] == 'BootMode':
+                if attr_name['value'] == 'Uefi':
+                    boot_mode = 'boot_mode:bios'
+                else:
+                    boot_mode = 'boot_mode:uefi'
+        return boot_mode
+
+    @decorators.idempotent_id('c2bebda2-fd27-4b10-9015-f7d877f0eb60')
+    @utils.services('image', 'network')
+    def test_sync_boot_mode(self):
+        path = '/properties/capabilities'
+        mode_to_update = self.get_boot_mode_from_baremetal()
+        self.update_node(self.node['uuid'], [{'op': 'replace',
+                                              'path': path,
+                                              'value': mode_to_update}])
+        self.boot_and_verify_node()
