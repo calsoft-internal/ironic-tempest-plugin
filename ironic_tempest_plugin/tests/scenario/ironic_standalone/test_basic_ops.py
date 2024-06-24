@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_log import log as logging
 from tempest.common import utils
 from tempest import config
 from tempest.lib import decorators
@@ -21,6 +22,7 @@ from ironic_tempest_plugin.tests.scenario import \
     baremetal_standalone_manager as bsm
 
 CONF = config.CONF
+LOG = logging.getLogger(__name__)
 
 
 class BaremetalAgentIpmitoolWholedisk(bsm.BaremetalStandaloneScenarioTest):
@@ -435,4 +437,136 @@ class BaremetalRedfishIPxeWholediskHttpLink(
     @decorators.idempotent_id('113acd0a-9872-4631-b3ee-54da7e3bb262')
     @utils.services('network')
     def test_ip_access_to_server(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIdracDeployNodeipxe(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'idrac'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'ipxe'
+    deploy_interface = 'direct'
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIdracDeployNodeipxe, cls).skip_checks()
+        if not CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Skipping the test case since ipxe is disabled")
+            raise cls.skipException(skip_msg)
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('b467889b-aba4-4696-9e6f-4ef60a3f78a4')
+    def test_deploy_node(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIdracDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'idrac'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'pxe'
+    deploy_interface = 'direct'
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIdracDeployNodepxe, cls).skip_checks()
+        if CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Skipping the test case since ipxe is enabled")
+            raise cls.skipException(skip_msg)
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('20c0f2f4-723b-4d1e-a4f2-bea11ffb1513')
+    def test_deploy_node(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIdracWSManDeployNode(BaremetalIdracDeployNodeipxe):
+    power_interface = 'idrac-wsman'
+    management_interface = 'idrac-wsman'
+
+
+class BaremetalIdracWSManDeployNodepxe(BaremetalIdracDeployNodepxe):
+    power_interface = 'idrac-wsman'
+    management_interface = 'idrac-wsman'
+
+
+class BaremetalIdracRedfishDeployNode(BaremetalIdracDeployNodeipxe):
+
+    power_interface = 'idrac-redfish'
+    management_interface = 'idrac-redfish'
+
+
+class BaremetalIdracRedfishDeployNodepxe(BaremetalIdracDeployNodepxe):
+
+    power_interface = 'idrac-redfish'
+    management_interface = 'idrac-redfish'
+
+
+class BaremetalRedfishDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'redfish'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'pxe'
+    deploy_interface = 'direct'
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalRedfishDeployNodepxe, cls).skip_checks()
+        if CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Skipping the test case since ipxe is enabled")
+            raise cls.skipException(skip_msg)
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('2bf34541-5514-4ea7-b073-7707d408ce99')
+    def test_deploy_node(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIpmiDeployNode(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'ipmi'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'ipxe'
+    deploy_interface = 'direct'
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIpmiDeployNode, cls).skip_checks()
+        if not CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Skipping the test case since ipxe is disabled")
+            raise cls.skipException(skip_msg)
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('9cd5a47b-ef96-4d64-9118-be467b24d1bf')
+    def test_deploy_node(self):
+        self.boot_and_verify_node()
+
+
+class BaremetalIpmiDeployNodepxe(bsm.BaremetalStandaloneScenarioTest):
+
+    mandatory_attr = ['driver']
+    api_microversion = '1.31'  # to set the deploy_interface
+    driver = 'ipmi'
+    image_ref = CONF.baremetal.whole_disk_image_ref
+    boot_interface = 'pxe'
+    deploy_interface = 'direct'
+
+    @classmethod
+    def skip_checks(cls):
+        super(BaremetalIpmiDeployNodepxe, cls).skip_checks()
+        if CONF.baremetal_feature_enabled.ipxe_enabled:
+            skip_msg = ("Skipping the test case since ipxe is enabled")
+            raise cls.skipException(skip_msg)
+
+    @utils.services('image', 'network')
+    @decorators.idempotent_id('d68a38aa-b731-403a-9d40-b3b49ea75e9b')
+    def test_deploy_node(self):
         self.boot_and_verify_node()
